@@ -95,6 +95,7 @@ function combatSequence()
                 var dmg = player1.generateDamage();
                 enemy.takeDamage(dmg);
                 textElement.innerText = "Enemy damaged for " + dmg + " points of damage";
+                //textElement.appendChild("Enemy damaged for " + dmg + " points of damage");
                 if(enemy.getHp() === 0)
                 {
                     textElement.innerText = "Enemy has been defeated";
@@ -193,7 +194,8 @@ function combatSequence()
                             console.log("Player health: " + player1.getHp());
                             textElement.innerText = "Player healed for " + dmg + " health";
                             playerStats.innerText = player1.getStats();
-                            
+                            enemyTurn(enemy);
+                            combatSequence();
                         });
                     }
                     optionButtonsElement.appendChild(magButton);

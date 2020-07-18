@@ -44,7 +44,7 @@ class Person
         this.hp += dmg;
         if(this.hp > this.maxHp)
         {
-            this.hp = self.maxHp;
+            this.hp = this.maxHp;
         }
     }
     getHp()
