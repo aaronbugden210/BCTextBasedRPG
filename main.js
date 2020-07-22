@@ -1,4 +1,3 @@
-//import Person from "classes/Person.js";
 
 // Variables that will be used change content on game screen
 const playerStats = document.getElementById("player-stats");
@@ -7,16 +6,21 @@ const textElement = document.getElementById("text");
 const optionButtonsElement = document.getElementById("option-btns");
 
 var fire = new Spell("Fire", 20, 50, "black");
-var thunder = new Spell("Thunder", 25, 250, "black");
+var thunder = new Spell("Thunder", 20, 50, "black");
 //var blizzard = new Spell("Blizzard", 20, 600, "black");
 //var meteor = new Spell("Meteor", 40, 1200, "black");
-
 var cure = new Spell("Cure", 10, 70, "white");
 //var cura = new Spell("Cura", 20, 100, "white");
 
-var playerSpells = [fire, thunder, cure];
+var potion = new Item("Potion", "potion", "Heals 50 hp", 50, 3);
+var elixer = new Item("Elixer", "elixer", "Fully restores HP/MP", 999, 1);
 
-let player1 = new Person("Harry", 100, 20, 35, 50, playerSpells, []);
+var grenade = new Item("Grenade", "attack", "Deals 500 damage", 150, 2);
+
+var playerSpells = [fire, thunder, cure];
+var playerItems = [potion, elixer, grenade];
+
+let player1 = new Person("Harry", 100, 20, 35, 50, playerSpells, playerItems);
 var enemy;
 
 let state = {};
@@ -24,7 +28,7 @@ let state = {};
 // Starts game (duh)
 function startGame()
 {
-    playerStats.innerText = player1.getStats();
+    playerStats.innerText = player1.name + ": " + player1.getStats();
     state = {};
     enemy = new Enemy("CyberImp", 100, 50, 15, 15);
     enemy.chooseType();
@@ -36,7 +40,7 @@ function startGame()
 function showTextNode(textNodeIndex)
 {
     const textNode = textNodes.find(textNode => textNode.id === textNodeIndex);
-    textElement.innerText = textNode.text;
+    appendText(textNode.text);
     while(optionButtonsElement.firstChild)
     {
         optionButtonsElement.removeChild(optionButtonsElement.firstChild);
@@ -71,6 +75,10 @@ function selectOption(option)
     showTextNode(nextTextNodeId);
 }
 
+// Using spells currently doesn't append text for all spells
+// Needs fixing
+// Running combatSequence() after using a spell currently doesn't append text but deletes all previous actions
+
 // combat sequence
 function combatSequence()
 {
@@ -80,7 +88,10 @@ function combatSequence()
         optionButtonsElement.removeChild(optionButtonsElement.firstChild);
     }
 
-    textElement.innerText = "An enemy attacks";
+    // Node variables, if necessary
+    let firstNode = "An enemy attacks\n"
+    appendText(firstNode);
+    //textElement.innerText = "An enemy attacks\n";
 
     for(var i = 0; i < player1.actions.length; i++)
     {
@@ -94,11 +105,12 @@ function combatSequence()
             {
                 var dmg = player1.generateDamage();
                 enemy.takeDamage(dmg);
-                textElement.innerText = "Enemy damaged for " + dmg + " points of damage";
-                //textElement.appendChild("Enemy damaged for " + dmg + " points of damage");
+                let node = "You damage the enemy for " + dmg + " points of damage";
+                appendText(node);
                 if(enemy.getHp() === 0)
                 {
-                    textElement.innerText = "Enemy has been defeated";
+                    node = "Enemy has been defeated";
+                    appendText(node);
                     enemyStats.innerText = "";
                     delete enemy;
                     showTextNode(1);
@@ -131,17 +143,58 @@ function combatSequence()
                         {
                             if(player1.magic[0].cost > player1.mp)
                             {
-                                textElement.innerText = "Not enough mana for this spell";
-                                setTimeout(() => {combatSequence();}, 2000);
+                                let node = "Not enough mana for this spell";
+                                appendText(node);
+                                //textElement.innerText = "Not enough mana for this spell";
+                                combatSequence();
                             }
                             else if(player1.magic[0].cost <= player1.mp)
                             {
-                                player1.reduceMp(player1.magic[0].cost);
-                                playerStats.innerText = player1.getStats();
+                                var cost = player1.magic[0].cost;
                                 var dmg = player1.magic[0].dmg;
+                                player1.reduceMp(cost);
+                                playerStats.innerText = player1.getStats();
                                 enemy.takeDamage(dmg);
-                                console.log("Fire Spell damage = " + dmg);
-                                textElement.innerText = "Enemy hit by fire for " + dmg + " points of damage";
+                                let node = "Enemy hit by fire for " + dmg + " points of damage";
+                                appendText(node);
+                                //textElement.innerText = "Enemy hit by fire for " + dmg + " points of damage";
+                                if(enemy.getHp() === 0)
+                                {
+                                    node = "Enemy has been defeated";
+                                    appendText(node);
+                                    //textElement.innerText = "Enemy has been defeated";
+                                    enemyStats.innerText = "";
+                                    delete enemy;
+                                    showTextNode(1);
+                                }
+                                else
+                                {
+                                    enemyTurn(enemy);
+                                    combatSequence();
+                                    return enemyStats.innerText = enemy.name + ": " + enemy.getStats();
+                                }
+                            }
+                        });
+                    }
+                    // Add nodes to rest of spells
+                    //thunder button
+                    else if(j === 1)
+                    {
+                        magButton.addEventListener("click", () =>
+                        {
+                            if(player1.magic[1].cost > player1.mp)
+                            {
+                                textElement.innerText = "Not enough mana for this spell";
+                                setTimeout(() => {combatSequence();}, 2000);
+                            }
+                            else if(player1.magic[1].cost <= player1.mp)
+                            {
+                                var cost = player1.magic[1].cost;
+                                var dmg = player1.magic[1].dmg;
+                                player1.reduceMp(cost);
+                                playerStats.innerText = player1.getStats();
+                                enemy.takeDamage(dmg);
+                                textElement.innerText = "Enemy hit by thunder for " + dmg + " points of damage";
                                 if(enemy.getHp() === 0)
                                 {
                                     textElement.innerText = "Enemy has been defeated";
@@ -158,31 +211,6 @@ function combatSequence()
                             }
                         });
                     }
-                    //thunder button
-                    else if(j === 1)
-                    {
-                        magButton.addEventListener("click", () =>
-                        {
-                            var dmg = player1.magic[1].dmg;
-                            enemy.takeDamage(dmg);
-                            console.log("Thunder Spell damage = " + dmg);
-                            textElement.innerText = "Enemy hit by thunder for " + dmg + " points of damage";
-                            if(enemy.getHp() === 0)
-                            {
-                                textElement.innerText = "Enemy has been defeated";
-                                enemyStats.innerText = "";
-                                delete enemy;
-                                battleRunning = false;
-                                showTextNode(1);
-                            }
-                            else
-                            {
-                                enemyTurn(enemy);
-                                combatSequence();
-                                return enemyStats.innerText = enemy.name + ": " + enemy.getStats();
-                            }
-                        });
-                    }
                     // heal button
                     else if(j === 2)
                     {
@@ -190,8 +218,6 @@ function combatSequence()
                         {
                             var dmg = player1.magic[2].dmg;
                             player1.heal(dmg);
-                            console.log("Heal Spell = " + dmg + " health restored");
-                            console.log("Player health: " + player1.getHp());
                             textElement.innerText = "Player healed for " + dmg + " health";
                             playerStats.innerText = player1.getStats();
                             enemyTurn(enemy);
@@ -204,7 +230,34 @@ function combatSequence()
         }
         else if(i === 2)
         {
-            button.addEventListener("click", () => player1.chooseItems());
+            button.addEventListener("click", () => 
+            {
+                while(optionButtonsElement.firstChild)
+                {
+                    optionButtonsElement.removeChild(optionButtonsElement.firstChild);
+                }
+                for(var j = 0; j < player1.items.length; j++)
+                {
+                    const itemButton = document.createElement("button");
+                    itemButton.innerText = player1.items[j].name;
+                    itemButton.classList.add("btn");
+
+                    // atm, potion
+                    if(j === 0)
+                    {
+                        itemButton.addEventListener("click", () =>
+                        {
+                            var prop = player1.items[0].prop;
+                            player1.heal(prop);
+                            textElement.innerText = "Player healed for " + prop + " health";
+                            playerStats.innerText = player1.getStats();
+                            enemyTurn(enemy);
+                            combatSequence();
+                        });
+                    }
+                    optionButtonsElement.appendChild(itemButton);
+                }
+            });
         }
         optionButtonsElement.appendChild(button);
     }
@@ -213,11 +266,19 @@ function combatSequence()
 function enemyTurn(x)
 {
     var dmg = x.generateDamage();
+    var node = "Enemy does " + dmg + " points of damage to the player";
     player1.takeDamage(dmg);
-    textElement.innerText = "Enemy does " + dmg + " points of damage";
-    playerStats.innerText = player1.getStats();
-
+    appendText(node);
+    playerStats.innerText = player1.name + ": " + player1.getStats();
     console.log("Enemy damage: :" + dmg);
+}
+
+function appendText(node)
+{
+    let parent = document.getElementById("text");
+    let p = document.createElement('p');
+    let newNode = document.createTextNode(node);
+    parent.append(newNode, p);
 }
 
 const textNodes = [

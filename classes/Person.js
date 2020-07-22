@@ -1,7 +1,7 @@
 
 class Person
 {
-    constructor(name, hp, mp, atk, df, magic, items) //Add def, magic, items
+    constructor(name, hp, mp, atk, df, magic, items)
     {
         this.name = name;
         this.maxHp = hp;
@@ -19,16 +19,11 @@ class Person
     generateDamage()
     {
         var genDamage = Math.floor(Math.random() * (this.atkH - this.atkL) + this.atkL);
-        console.log(genDamage);
         return genDamage;
     }
     generateMagicDmg()
     {
         return console.log(500);
-    }
-    chooseItems()
-    {
-        return console.log("Clicked items");
     }
     takeDamage(dmg)
     {
@@ -63,7 +58,6 @@ class Person
     {
         return this.maxMp;
     }
-
     reduceMp(cost)
     {
         this.mp -= cost;
