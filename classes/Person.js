@@ -15,7 +15,6 @@ class Person
         this.items = items;
         this.actions = ["Attack", "Magic", "Items"];
     }
-
     generateDamage()
     {
         var genDamage = Math.floor(Math.random() * (this.atkH - this.atkL) + this.atkL);
@@ -63,22 +62,6 @@ class Person
         this.mp -= cost;
         return this.mp;
     }
-    // chooseActions(actionNodeIndex)
-    // {
-    //     const actionNode = actionNodes.find(actionNode => actionNode.id === actionNodeIndex);
-    //     var i = 1;
-    //     this.actions.forEach(action => 
-    //     {
-    //         const button = document.createElement("button");
-    //         button.innerText = option.text;
-    //         button.classList.add("btn");
-    //         button.addEventListener("click", () => selectOption(option));
-    //         optionButtonsElement.appendChild(button);
-    //         console.log(i.toString() + ":" + action);
-    //         i += 1;
-    //     });
-    // }
-
     getStats()
     {
         // Add display name here and in person object
