@@ -9,11 +9,11 @@ class Spell
         this.type = type;
     }
 
-    generateMagicDamage()
-    {
-        var atkLow = this.dmg - 15;
-        var atkHigh = this.dmg + 15;
-        var totalDamage = Math.floor(Math.random() * (this.atkHigh - this.atkLow) + this.atkL);
-        return totalDamage;
-    }
+    // generateMagicDamage()
+    // {
+    //     var atkLow = this.dmg - 15;
+    //     var atkHigh = this.dmg + 15;
+    //     var totalDamage = Math.floor(Math.random() * (this.atkHigh - this.atkL) + this.atkL);
+    //     return totalDamage;
+    // }
 }

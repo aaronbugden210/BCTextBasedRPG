@@ -20,7 +20,7 @@ var grenade = new Item("Grenade", "attack", "Deals 500 damage", 150, 2);
 var playerSpells = [fire, thunder, cure];
 var playerItems = [potion, elixer, grenade];
 
-let player1 = new Person("Harry", 100, 50, 25, 50, playerSpells, playerItems);
+let player1 = new Person("Harry", 100, 50, 10, 10, playerSpells, playerItems, 6, 4);
 var enemy;
 
 let state = {};
@@ -30,7 +30,7 @@ function startGame()
 {
     playerStats.innerText = player1.name + ": " + player1.getStats();
     state = {};
-    enemy = new Enemy("CyberImp", 100, 50, 15, 15);
+    enemy = new Enemy("CyberImp", 100, 50, 5, 15, [], [], 4, 4);
     enemy.chooseType();
     combatSequence();
     //showTextNode(1);
@@ -85,7 +85,7 @@ function combatSequence()
     }
 
     // Node variables, if necessary
-    let firstNode = "An enemy attacks\n"
+    let firstNode = "An enemy attacks\n";
     appendText(firstNode);
 
     // Creates action buttons
@@ -101,8 +101,9 @@ function combatSequence()
             {
                 var dmg = player1.generateDamage();
                 enemy.takeDamage(dmg);
-                let node = "You damage the enemy for " + dmg + " points of damage";
-                appendText(node);
+                //let node = "You damage the enemy for " + dmg + " points of damage";
+                let node;
+                //appendText(node);
                 if(enemy.getHp() === 0)
                 {
                     node = "Enemy has been defeated";
@@ -113,6 +114,8 @@ function combatSequence()
                 }
                 else
                 {
+                    node = "You hit the enemy";
+                    appendText(node);
                     enemyTurn(enemy);
                     return enemyStats.innerText = enemy.name + ": " + enemy.getStats();
                 }
@@ -150,7 +153,7 @@ function combatSequence()
                             player1.reduceMp(cost);
                             playerStats.innerText = player1.getStats();
                             enemy.takeDamage(dmg);
-                            let node = "Enemy hit by " + magic.name + " for " + dmg + " points of damage";
+                            let node = "Enemy hit by " + magic.name;
                             appendText(node);
                             if(enemy.getHp() === 0)
                             {
@@ -172,7 +175,7 @@ function combatSequence()
                         {
                             player1.reduceMp(cost);
                             player1.heal(dmg);
-                            let node = "Player healed for " + dmg + " health";
+                            let node = "Player healed";
                             appendText(node);
                             playerStats.innerText = player1.getStats();
                             enemyTurn(enemy);
@@ -208,7 +211,7 @@ function combatSequence()
                         {
                             player1.heal(prop);
                             item.quantity -= 1;
-                            let node = "Player healed for " + prop + " health";
+                            let node = "Player healed";
                             appendText(node);
                             playerStats.innerText = player1.getStats();
                             enemyTurn(enemy);
@@ -229,7 +232,7 @@ function combatSequence()
                         else if(type === "attack" && item.quantity >= 1)
                         {
                             enemy.takeDamage(prop);
-                            let node = "Enemy hit by " + item.name + " for " + prop + " points of damage";
+                            let node = "Enemy hit by " + item.name;
                             appendText(node);
                             if(enemy.getHp() === 0)
                             {
@@ -277,6 +280,15 @@ function enemyTurn(x)
         player1.takeDamage(dmg);
         appendText(node);
         playerStats.innerText = player1.name + ": " + player1.getStats();
+        if(player1.getHp() === 0)
+        {
+            node = "You have been defeated by the enemy";
+            appendText(node);
+            while(optionButtonsElement.firstChild)
+            {
+                optionButtonsElement.removeChild(optionButtonsElement.firstChild);
+            }
+        }
     }
     // Determine spell to use
     else if(choice === 1)
@@ -296,7 +308,7 @@ function enemyTurn(x)
             x.reduceMp(cost);
             player1.takeDamage(dmg);
             playerStats.innerText = player1.getStats();
-            let node = "Enemy hits you with " + magic.name + " for " + dmg + " points of damage";
+            let node = "Enemy hits you with " + magic.name;
             appendText(node);
             if(player1.getHp() === 0)
             {
@@ -316,7 +328,7 @@ function enemyTurn(x)
         {
             x.reduceMp(cost);
             x.heal(dmg);
-            let node = "Enemy healed for " + dmg + " health";
+            let node = "Enemy healed";
             appendText(node);
             enemyStats.innerText = x.getStats();
         }
